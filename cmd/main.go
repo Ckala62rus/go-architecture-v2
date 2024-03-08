@@ -3,18 +3,20 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"io"
-	log2 "log"
 	"log/slog"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"practice/domains"
 	config "practice/internal/config"
 	handlers "practice/pkg/handlers"
 	"practice/pkg/repositories"
 	"practice/pkg/services"
+	"syscall"
 )
 
 const (
@@ -68,33 +70,40 @@ func main() {
 	if err := srv.Run("8081", handlerCollection.InitRoutes()); err != nil {
 		log.Debug("error occured while running http server: %s", err.Error())
 	}
-
-	//user := service.Users.GetUser()
-	//newUser := service.Users.CreateUser("Evgeniy", 34)
-	//
-	//fmt.Printf("user with name %s \n", user.Name)
-	//fmt.Printf("user with name %s \n", newUser.Name)
 }
 
 func setupLogger(env string) *slog.Logger {
 	var log *slog.Logger
 
-	f, err := os.OpenFile("logging", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		log2.Fatalf("error opening file: %v", err)
+	f := &lumberjack.Logger{
+		Filename:   "logs/logs.log",
+		MaxSize:    500, // megabytes
+		MaxBackups: 3,
+		MaxAge:     28,   //days
+		Compress:   true, // disabled by default
 	}
-	defer f.Close()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGHUP)
+
+	go func() {
+		for {
+			<-c
+			f.Rotate()
+		}
+	}()
 
 	switch env {
-	//case envLocal:
-	//	log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	case envLocal:
+		//log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 		log = slog.New(slog.NewJSONHandler(f, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	case envDev:
-		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+		log = slog.New(slog.NewJSONHandler(f, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	case envProd:
 		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
 	}
+
+	//log = slog.New(slog.NewJSONHandler(f, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
 	return log
 }
