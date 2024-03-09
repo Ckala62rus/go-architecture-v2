@@ -2,15 +2,20 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
+	"log/slog"
 	"practice/pkg/services"
 )
 
 type Handler struct {
 	services *services.Service
+	log      *slog.Logger
 }
 
-func NewHandler(services *services.Service) *Handler {
-	return &Handler{services: services}
+func NewHandler(services *services.Service, log *slog.Logger) *Handler {
+	return &Handler{
+		services: services,
+		log:      log,
+	}
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {

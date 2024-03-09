@@ -13,11 +13,15 @@ type GetUser struct {
 func (h *Handler) Hello(c *gin.Context) {
 	user := h.services.GetUser()
 
+	h.log.Debug("handler hello")
+
 	var getUser GetUser
 	err := c.ShouldBindUri(&getUser)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+
+	h.log.Debug(getUser.Name)
 
 	fmt.Println(getUser.Name)
 
