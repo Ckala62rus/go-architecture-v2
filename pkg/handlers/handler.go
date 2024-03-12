@@ -1,10 +1,19 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
 	"log/slog"
 	"practice/pkg/services"
+
+	_ "practice/docs"
+
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files" // swagger embed files
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+// gin-swagger middleware
+// swagger embed files
+
 
 type Handler struct {
 	services *services.Service
@@ -18,6 +27,13 @@ func NewHandler(services *services.Service, log *slog.Logger) *Handler {
 	}
 }
 
+// @Summary      Testing route
+// @Description  get test json response
+// @Param name   path string true "user name"
+// @Tags         Testing
+// @Accept       json
+// @Produce      json
+// @Router       /hello/{name} [get]
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
@@ -25,6 +41,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		api.GET("/hello/:name", h.Hello)
 	}
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

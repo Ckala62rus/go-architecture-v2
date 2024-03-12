@@ -2,10 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"io"
 	"os"
 	"path/filepath"
 	"practice/domains"
@@ -14,8 +10,30 @@ import (
 	handlers "practice/pkg/handlers"
 	"practice/pkg/repositories"
 	"practice/pkg/services"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
+// @title           Swagger Example API
+// @version         1.0
+// @description     This is a sample server celler server.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8081
+// @BasePath  /api
+
+// @securityDefinitions.basic  BasicAuth
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 	// todo init config: cleanenv
 	projectDir, err := os.Getwd()
@@ -46,8 +64,8 @@ func main() {
 
 	// todo init router: gin-gonic router
 	// Logging to a file.
-	f, _ := os.Create("gin.log")
-	gin.DefaultWriter = io.MultiWriter(f)
+	// f, _ := os.Create("gin.log")
+	// gin.DefaultWriter = io.MultiWriter(f)
 
 	rep := repositories.NewRepository()
 	service := services.NewService(rep)
