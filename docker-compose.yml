@@ -14,6 +14,17 @@ services:
     depends_on:
       - db_golang
 
+  worker:
+    container_name: worker
+    build:
+      context: .
+      dockerfile: ./docker/worker/DockerFile
+    volumes:
+      - ./src:/src
+    depends_on:
+      - db_golang
+      - backend
+
   db_golang:
     container_name: db_golang
     image: postgres:14.1-alpine

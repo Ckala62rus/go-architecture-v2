@@ -18,3 +18,7 @@ go build -o app ./cmd/main.go
 run app in container
 ./cmd/app
 
+compile worker application
+go build -o worker ./worker/worker.go
+
+sh bootstrap.sh

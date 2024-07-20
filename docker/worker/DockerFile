@@ -1,0 +1,15 @@
+FROM golang:1.22.0-alpine
+LABEL authors="Ckala"
+WORKDIR /src
+
+
+ENV CGO_ENABLED=0
+
+RUN apk update
+RUN apk add gcompat
+RUN apk add mc
+
+RUN cd /src go mod tidy
+
+ENTRYPOINT ["sh", "bootstrap_worker.sh"]
+# CMD ["./worker/worker"]

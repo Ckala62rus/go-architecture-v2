@@ -2,8 +2,6 @@ FROM golang:1.22.0-alpine
 LABEL authors="Ckala"
 WORKDIR /src
 
-# COPY go.mod go.sum .
-
 ENV CGO_ENABLED=0
 
 RUN apk update
@@ -13,7 +11,5 @@ RUN apk add mc
 RUN cd /src go mod tidy
 
 
-
-# RUN go build -o ./cmd/app ./cmd/main.go
-# CMD ["go build -o ./cmd/app ./cmd/main.go"]
-CMD ["./cmd/app"]
+ENTRYPOINT ["sh", "bootstrap_app.sh"]
+# CMD ["./cmd/app"]
