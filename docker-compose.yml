@@ -1,0 +1,26 @@
+version: '3.3'
+
+services:
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: ./docker/go/DockerFile
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./src:/src
+    tty: true
+    depends_on:
+      - db_golang
+
+  db_golang:
+    container_name: db_golang
+    image: postgres:14.1-alpine
+#    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/postgres:/var/lib/postgresql/data
+    env_file:
+      - .env

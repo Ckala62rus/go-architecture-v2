@@ -1,0 +1,12 @@
+env: "dev" # local, dev, prod
+config_file: "local.yml"
+http_server:
+    address: "localhost:8082"
+    timeout: 4s # время соединения, за какое сервер должен вернуть результат
+    idle_timeout: 60s # время жизни соединения, на случай если клиент снова обратиться к серверу
+database:
+    postgres_host: "db_golang"
+    postgres_port: "5432"
+    postgres_user: "postgres"
+    postgres_password: "postgres"
+    postgres_db: "postgres"

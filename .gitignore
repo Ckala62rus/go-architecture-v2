@@ -1,4 +1,3 @@
 .idea
-gin.log
-logging
-/docs
+.env
+docker/postgres
