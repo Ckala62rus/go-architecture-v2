@@ -1,4 +1,7 @@
 1. generate swagger documentation
+
+   go install github.com/swaggo/swag/cmd/swag@latest
+
    swag init -g ./cmd/main.go -o ./docs
 
    documentation swagger

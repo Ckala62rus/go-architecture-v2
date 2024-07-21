@@ -5,8 +5,7 @@ WORKDIR /src
 ENV CGO_ENABLED=0
 
 RUN apk update
-RUN apk add gcompat
-RUN apk add mc
+RUN apk add gcompat mc curl
 
 RUN cd /src go mod tidy
 
