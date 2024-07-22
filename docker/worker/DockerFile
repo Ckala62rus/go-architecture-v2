@@ -11,5 +11,6 @@ RUN apk add mc
 
 RUN cd /src go mod tidy
 
+ENTRYPOINT ["dos2unix", "bootstrap_worker.sh"]
 ENTRYPOINT ["sh", "bootstrap_worker.sh"]
 # CMD ["./worker/worker"]

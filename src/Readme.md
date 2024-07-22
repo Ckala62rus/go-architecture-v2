@@ -13,15 +13,15 @@
 3. swagger documentation
    http://localhost:8081/swagger/index.html
 
-docker exec -ti backend /bin/sh
-docker-compose down
-docker-compose build
-go build -o app ./cmd/main.go
+4. если будет проблема при запуске скриптов sh,
+   то заходим в контейнер и применяем на скриптах
+   dos2unix bootstrap_app.sh
+   (проблема связана с переводом коретки на новую строку windows и linux)
 
-run app in container
-./cmd/app
+5. Docker
+   docker exec -ti backend /bin/sh
+   docker-compose down
+   docker-compose build
 
-compile worker application
-go build -o worker ./worker/worker.go
-
-sh bootstrap.sh
+   go build -o app ./cmd/main.go
+   sh bootstrap.sh

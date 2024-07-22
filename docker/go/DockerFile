@@ -10,5 +10,6 @@ RUN apk add gcompat mc curl
 RUN cd /src go mod tidy
 
 
+ENTRYPOINT ["dos2unix", "bootstrap_app.sh"]
 ENTRYPOINT ["sh", "bootstrap_app.sh"]
 # CMD ["./cmd/app"]
