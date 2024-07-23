@@ -25,3 +25,5 @@
 
    go build -o app ./cmd/main.go
    sh bootstrap.sh
+
+   docker-compose up --build --force-recreate --renew-anon-volumes
