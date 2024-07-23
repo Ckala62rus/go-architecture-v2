@@ -2,3 +2,5 @@
 gin.log
 logging
 /docs
+supervisord.log
+supervisord.pid

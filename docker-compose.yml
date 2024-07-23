@@ -25,6 +25,23 @@ services:
       - db_golang
       - backend
 
+  supervisor-go:
+    container_name: supervisor-go
+    build:
+      context: .
+      dockerfile: ./docker/supervisor/DockerFile
+    tty: true
+    env_file:
+      - .env
+    ports:
+      - '8081:8081'
+    volumes:
+      - ./src:/src
+      - ./log:/var/log
+    depends_on:
+      - db_golang
+      - backend
+
   db_golang:
     container_name: db_golang
     image: postgres:14.1-alpine

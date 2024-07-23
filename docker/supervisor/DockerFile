@@ -1,0 +1,18 @@
+FROM golang:1.22.0-alpine
+LABEL authors="Ckala"
+WORKDIR /src
+
+
+ENV CGO_ENABLED=0
+
+RUN apk update
+RUN apk add gcompat
+RUN apk add mc
+RUN apk add --no-cache supervisor
+
+RUN cd /src go mod tidy
+
+COPY /docker/supervisor/supervisord.conf /etc/supervisord.conf
+
+CMD ["dos2unix", "bootstrap_supervisor.sh"]
+ENTRYPOINT ["sh", "bootstrap_supervisor.sh"]
