@@ -27,7 +27,7 @@ import (
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host      localhost:8081
+// @host      localhost:5000
 // @BasePath  /api
 
 // @securityDefinitions.basic  BasicAuth
@@ -62,6 +62,10 @@ func main() {
 		db.Debug()
 	}
 
+	if err != nil {
+		panic(err)
+	}
+
 	// todo init router: gin-gonic router
 	// Logging to a file.
 	// f, _ := os.Create("gin.log")
@@ -73,8 +77,8 @@ func main() {
 
 	// todo server: standart golang server
 	srv := new(domains.Server)
-	if err := srv.Run("8081", handlerCollection.InitRoutes()); err != nil {
+	if err := srv.Run(cfg.HttpServer.Port, handlerCollection.InitRoutes()); err != nil {
 		log.Debug("error occured while running http server: %s", err.Error())
 	}
-	print("server started in 8081 port")
+	fmt.Printf("server started in %s port", cfg.HttpServer.Port)
 }

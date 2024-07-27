@@ -1,3 +1,5 @@
 .idea
 .env
 docker/postgres
+src/cmd/app
+src/worker/worker
