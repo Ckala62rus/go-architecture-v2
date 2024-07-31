@@ -27,3 +27,5 @@
    sh bootstrap.sh
 
    docker-compose up --build --force-recreate --renew-anon-volumes
+
+6. Документация по Gin framework https://gin-gonic.com/
