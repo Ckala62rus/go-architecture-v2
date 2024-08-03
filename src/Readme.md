@@ -28,8 +28,12 @@
 
    docker-compose up --build --force-recreate --renew-anon-volumes
 
+6. Документация по Gin framework https://gin-gonic.com/
+
 //todo
    1) Сделать DTO структуры для входных и выходных данных
    2) Сделать авторизацию по JWT или по BasicAuth
    3) Привести код в порядок
    4) Добаавить реализацию Redis PubSub
+
+
