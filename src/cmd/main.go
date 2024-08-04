@@ -33,6 +33,10 @@ import (
 
 // @securityDefinitions.basic  BasicAuth
 
+// @securityDefinitions.apikey Authorization
+// @in header
+// @name Authorization
+
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
@@ -75,7 +79,7 @@ func main() {
 	// f, _ := os.Create("gin.log")
 	// gin.DefaultWriter = io.MultiWriter(f)
 
-	rep := repositories.NewRepository()
+	rep := repositories.NewRepository(db)
 	service := services.NewService(rep)
 	handlerCollection := handlers.NewHandler(service, log)
 
