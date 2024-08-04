@@ -3,8 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/robfig/cron/v3"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"practice/internal/config"
 	"practice/pkg/repositories"
 	"practice/pkg/services"
 )
@@ -33,7 +37,30 @@ func main() {
 }
 
 func GetServiceForTask() *services.Service {
-	repo := repositories.NewRepository()
+	projectDir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	cfg := config.MustLoad(filepath.Join(projectDir, "config", "local.yml"))
+	//fmt.Printf("%+v", cfg) // todo need delete!
+
+	// todo init storage: gorm
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Moscow",
+		cfg.DatabaseConfig.Host,
+		cfg.DatabaseConfig.User,
+		cfg.DatabaseConfig.Password,
+		cfg.DatabaseConfig.Db,
+		cfg.DatabaseConfig.Port,
+	)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if cfg.Env == "local" || cfg.Env == "dev" {
+		db.Debug()
+	}
+
+	if err != nil {
+		panic(err)
+	}
+	repo := repositories.NewRepository(db)
 	return services.NewService(repo)
 }
 
@@ -43,6 +70,6 @@ func work() {
 
 func work2() {
 	service := GetServiceForTask()
-	user := service.Users.GetUser()
-	fmt.Printf("get user with name: %s \n", user.Name)
+	user := service.Users.GetAllUsers()
+	fmt.Printf("get user with name: %v \n", user)
 }
