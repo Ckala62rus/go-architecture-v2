@@ -10,6 +10,7 @@ import (
 	handlers "practice/pkg/handlers"
 	"practice/pkg/repositories"
 	"practice/pkg/services"
+	"practice/pkg/utils"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -65,6 +66,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// Run migration initialize
+	utils.AutoMigrateInitialize(db, log)
 
 	// todo init router: gin-gonic router
 	// Logging to a file.
