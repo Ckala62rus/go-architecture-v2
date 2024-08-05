@@ -1,17 +1,28 @@
-1. generate swagger documentation
+# Golang gin api template
 
-   go install github.com/swaggo/swag/cmd/swag@latest
+### Enviroment variables
+> Создать файл .env из .env.example
 
-   swag init -g ./cmd/main.go -o ./docs
+### Generate swagger documentation.
 
-   documentation swagger
-   https://github.com/swaggo/swag/blob/master/README.md#use-multiple-path-params
+#### Swagger documentation
+```Bash
 
-2. run app and regenerate swagger docs
-   swag init -g ./cmd/main.go -o ./docs; go run .\cmd\main.go
+# Package for create swagger documentation
+go install github.com/swaggo/swag/cmd/swag@latest
 
-3. swagger documentation
-   http://localhost:8081/swagger/index.html
+# Command for generate documentation
+swag init -g ./cmd/main.go -o ./docs
+
+# alternative generate documentation with run application 
+swag init -g ./cmd/main.go -o ./docs; go run .\cmd\main.go
+```
+
+### Official documentation for examples
+> https://github.com/swaggo/swag/blob/master/README.md#use-multiple-path-params
+
+### swagger documentation  address (by default)
+>   http://localhost:8081/swagger/index.html
 
 4. если будет проблема при запуске скриптов sh,
    то заходим в контейнер и применяем на скриптах
@@ -35,5 +46,5 @@
    2) Сделать авторизацию по JWT или по BasicAuth
    3) Привести код в порядок
    4) Добаавить реализацию Redis PubSub
-
+   5) Создать приложение блог с категориями, тегами и пользователем
 

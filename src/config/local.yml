@@ -7,8 +7,8 @@ http_server:
     idle_timeout: 60s # время жизни соединения, на случай если клиент снова обратиться к серверу
 database:
     # db_golang когда запускаем в Docker. localhost для запуска без docker
-    postgres_host: "db_golang"
-    postgres_port: "5432"
+    postgres_host: "localhost"
+    postgres_port: "5433"
     postgres_user: "postgres"
     postgres_password: "postgres"
     postgres_db: "db"
