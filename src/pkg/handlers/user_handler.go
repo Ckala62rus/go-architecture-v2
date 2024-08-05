@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"practice/pkg/dto"
 )
 
 type GetUser struct {
@@ -28,5 +29,38 @@ func (h *Handler) Hello(c *gin.Context) {
 		Status:  true,
 		Message: "Hello handler",
 		Data:    getUser.Name,
+	})
+}
+
+// GetAllUsers
+// @Summary      Get all users
+// @Description  return all users
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  StatusResponse
+// @Router       /users/ [get]
+// @Security Authorization
+func (h *Handler) GetAllUsers(c *gin.Context) {
+	users := h.services.Users.GetAllUsers()
+	//var usersDTO []dto.AllUsersOutDTO
+
+	//for _, user := range users {
+	//	dtoUserMap := dto.AllUsersOutDTO{
+	//		Id:        user.Id,
+	//		Name:      user.Name,
+	//		Email:     user.Email,
+	//		CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
+	//		UpdatedAt: user.UpdatedAt.Format("2006-01-02 15:04:05"),
+	//	}
+	//	usersDTO = append(usersDTO, dtoUserMap)
+	//}
+
+	usersDTO := dto.MapAllUser(users)
+
+	c.JSON(http.StatusOK, StatusResponse{
+		Status:  true,
+		Message: "all users",
+		Data:    usersDTO,
 	})
 }
