@@ -10,24 +10,23 @@ type GetUser struct {
 	Name string `uri:"name" binding:"required"`
 }
 
+// Hello
+// @Summary      Testing route
+// @Description  get test json response
+// @Param name   path string true "username"
+// @Tags         Testing
+// @Accept       json
+// @Produce      json
+// @Router       /hello/{name} [get]
 func (h *Handler) Hello(c *gin.Context) {
-	user := h.services.GetUser()
-
-	h.log.Debug("handler hello")
-
 	var getUser GetUser
 	err := c.ShouldBindUri(&getUser)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-
-	h.log.Debug(getUser.Name)
-
-	fmt.Println(getUser.Name)
-
 	c.JSONP(http.StatusOK, StatusResponse{
 		Status:  true,
 		Message: "Hello handler",
-		Data:    user,
+		Data:    getUser.Name,
 	})
 }
