@@ -64,3 +64,29 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 		Data:    usersDTO,
 	})
 }
+
+// GetUserByName
+// @Summary      Get user by Name
+// @Description  get user by Name
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        name path string  true "User name"
+// @Success      200  {object}  StatusResponse
+// @Router       /users/user/{name} [get]
+// @Security Authorization
+func (h *Handler) GetUserByName(c *gin.Context) {
+	name := c.Param("name")
+	user, err := h.services.Users.GetUserByName(name)
+	if err != nil {
+		newErrorResponse(c, http.StatusNotFound, err.Error())
+		return
+	}
+
+	userMap := dto.MapSingleUser(user)
+	c.JSON(http.StatusOK, StatusResponse{
+		Status:  true,
+		Message: "one user",
+		Data:    userMap,
+	})
+}
