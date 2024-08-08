@@ -51,3 +51,13 @@ func MapSingleUser(user domains.User) UserOutDTO {
 
 	return usersDTO
 }
+
+type CreateAuthUser struct {
+	Email    string `example:"agr.akyla@mail.ru"`
+	Password string `example:"123123"`
+}
+
+type SignInInput struct {
+	Email    string `json:"email" binding:"required" example:"agr.akyla@mail.ru"`
+	Password string `json:"password" binding:"required" example:"123123"`
+}
