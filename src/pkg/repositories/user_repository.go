@@ -15,22 +15,22 @@ func NewUserDB(db *gorm.DB) *UserDB {
 	return &UserDB{db: db}
 }
 
-//func (u *UserDB) GetUser() domainss.User {
-//	user := domainss.User{Name: "Admin", Age: 30}
-//	return user
-//}
-//
-//func (u *UserDB) CreateUser(name string, age int) domainss.User {
-//	user := domainss.User{Name: name, Age: age}
-//	return user
-//}
-
 func (u *UserDB) GetUserByName(name string) (domains.User, error) {
 	user := domains.User{}
 	u.db.Debug().Where("name = ?", name).First(&user)
 	if user.Id == 0 {
 		mistake := fmt.Sprintf("user with name:%s not found", name)
 		return user, errors.New(mistake)
+	}
+	return user, nil
+}
+
+func (u *UserDB) GetUserByEmail(email string) (domains.User, error) {
+	user := domains.User{}
+	u.db.Where(map[string]interface{}{"email": email}).Find(&user)
+	if user.Id == 0 {
+		msg := fmt.Sprintf("User with email %s not found", email)
+		return user, errors.New(msg)
 	}
 	return user, nil
 }
@@ -51,10 +51,10 @@ func (u *UserDB) GetAllUsers() []domains.User {
 	return users
 }
 
-func (u *UserDB) CreateUser(user domains.User) (domains.User, error) {
-	result := u.db.Create(&user)
-	return user, result.Error
-}
+//func (u *UserDB) CreateUser(user domains.User) (domains.User, error) {
+//	result := u.db.Create(&user)
+//	return user, result.Error
+//}
 
 func (u *UserDB) DeleteUserById(id int) (bool, error) {
 	res := u.db.Delete(&domains.User{}, id)
