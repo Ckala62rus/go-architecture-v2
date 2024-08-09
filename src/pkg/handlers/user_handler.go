@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"practice/domains"
 	"practice/pkg/dto"
 	"strconv"
 )
@@ -190,5 +191,50 @@ func (h *Handler) DeleteUserById(c *gin.Context) {
 	c.JSON(http.StatusOK, StatusResponse{
 		Status:  true,
 		Message: fmt.Sprintf("User was delete with id:%d", id),
+	})
+}
+
+// UpdateUser
+// @Summary 	 Update user by id
+// @Tags         users
+// @Description  update user
+// @ID login
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "User ID"
+// @Param 	     input body dto.UpdateUserInDTO true "credentials"
+// @Success      200  {object}  StatusResponse
+// @Router       /users/{id} [put]
+// @Security Authorization
+func (h *Handler) UpdateUser(c *gin.Context) {
+	var user dto.UpdateUserInDTO
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusNotFound, err.Error())
+		return
+	}
+
+	err = c.BindJSON(&user)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	updateUser, err := h.services.Users.UpdateUser(
+		domains.User{
+			Id:   id,
+			Name: user.Name,
+		},
+	)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, StatusResponse{
+		Status:  true,
+		Message: "updated user",
+		Data:    updateUser,
 	})
 }
