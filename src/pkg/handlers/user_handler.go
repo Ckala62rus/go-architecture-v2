@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"practice/pkg/dto"
+	"strconv"
 )
 
 type GetUser struct {
@@ -84,6 +85,39 @@ func (h *Handler) GetUserByName(c *gin.Context) {
 	}
 
 	userMap := dto.MapSingleUser(user)
+	c.JSON(http.StatusOK, StatusResponse{
+		Status:  true,
+		Message: "one user",
+		Data:    userMap,
+	})
+}
+
+// GetById
+// @Summary      Get user by ID
+// @Description  get user by ID
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "User ID"
+// @Success      200  {object}  StatusResponse
+// @Router       /users/{id} [get]
+// @Security Authorization
+func (h *Handler) GetById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusNotFound, err.Error())
+		return
+	}
+
+	user, err := h.services.Users.GetById(id)
+
+	if err != nil {
+		newErrorResponse(c, http.StatusNotFound, err.Error())
+		return
+	}
+
+	userMap := dto.MapSingleUser(user)
+
 	c.JSON(http.StatusOK, StatusResponse{
 		Status:  true,
 		Message: "one user",

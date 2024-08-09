@@ -25,9 +25,9 @@ func (u *UserService) GetAllUsers() []domains.User {
 	return u.repo.GetAllUsers()
 }
 
-func (u *UserService) CreateUser(user domains.User) (domains.User, error) {
-	return u.repo.CreateUser(user)
-}
+//func (u *UserService) CreateUser(user domains.User) (domains.User, error) {
+//	return u.repo.CreateUser(user)
+//}
 
 func (u *UserService) DeleteUserById(id int) (bool, error) {
 	return u.repo.DeleteUserById(id)
