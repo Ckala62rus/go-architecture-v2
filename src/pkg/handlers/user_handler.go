@@ -124,3 +124,71 @@ func (h *Handler) GetById(c *gin.Context) {
 		Data:    userMap,
 	})
 }
+
+// CreateUser
+// @Summary Create user
+// @Tags users
+// @Description create new user
+// @ID login
+// @Accept  json
+// @Produce  json
+// @Param input body dto.CreateUserInDTO true "credentials"
+// @Success      200  {object}  StatusResponse
+// @Router /users/ [post]
+// @Security Authorization
+//func (h *Handler) CreateUser(c *gin.Context) {
+//	var user dto.CreateUserInDTO
+//
+//	err := c.BindJSON(&user)
+//	if err != nil {
+//		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+//		return
+//	}
+//
+//	newUser, err := h.services.Users.CreateUser(domains.User{
+//		Name:     user.Name,
+//		Email:    user.Email,
+//		Password: user.Password,
+//	})
+//	if err != nil {
+//		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+//		return
+//	}
+//
+//	userMap := dto.MapSingleUser(newUser)
+//
+//	c.JSON(http.StatusOK, StatusResponse{
+//		Status:  true,
+//		Message: "one user",
+//		Data:    userMap,
+//	})
+//}
+
+// DeleteUserById
+// @Summary      Delete user by ID
+// @Description  Delete user by ID
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "User ID"
+// @Success      200  {object}  StatusResponse
+// @Router       /users/{id} [delete]
+// @Security Authorization
+func (h *Handler) DeleteUserById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusNotFound, err.Error())
+		return
+	}
+
+	isDelete, err := h.services.Users.DeleteUserById(id)
+	if !isDelete {
+		newErrorResponse(c, http.StatusNotFound, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, StatusResponse{
+		Status:  true,
+		Message: fmt.Sprintf("User was delete with id:%d", id),
+	})
+}
