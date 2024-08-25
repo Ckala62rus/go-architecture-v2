@@ -79,3 +79,33 @@ func (h *Handler) SignIn(c *gin.Context) {
 		},
 	})
 }
+
+// Me
+// @Summary 	 User information
+// @Tags         auth
+// @Description  get authorization user information by id
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  StatusResponse
+// @Failure      401 {object} ErrorResponse
+// @Router       /auth/me [get]
+// @Security Authorization
+func (h *Handler) Me(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+	user, err := h.services.Users.GetById(userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	userDTO := dto.MapSingleUser(user)
+
+	c.JSON(http.StatusOK, StatusResponse{
+		Status:  true,
+		Message: "images was updated",
+		Data:    userDTO,
+	})
+}
