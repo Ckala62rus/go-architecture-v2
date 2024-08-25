@@ -40,3 +40,42 @@ func (h *Handler) SignUp(c *gin.Context) {
 		Data:    id,
 	})
 }
+
+// SignIn
+// @Summary Login
+// @Description login and return authorization bearer token
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param input body dto.SignInInput true "credentials"
+// @Success	200  {object}  StatusResponse
+// @Router /auth/sign-in [post]
+func (h *Handler) SignIn(c *gin.Context) {
+	var input dto.SignInInput
+
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	token, err := h.services.Authorization.GenerateToken(input.Email, input.Password)
+
+	if err != nil {
+		c.JSON(http.StatusOK, StatusResponse{
+			Status:  false,
+			Message: "authentication failed",
+			Data: map[string]interface{}{
+				"error": err.Error(),
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, StatusResponse{
+		Status:  true,
+		Message: "authentication success!",
+		Data: map[string]interface{}{
+			"token": "Bearer " + token,
+		},
+	})
+}
