@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"log/slog"
+	"net/http"
 	"practice/pkg/services"
 
 	_ "practice/docs"
