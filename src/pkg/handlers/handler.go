@@ -36,9 +36,33 @@ func NewHandler(services *services.Service, log *slog.Logger) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
+	// redirect on swagger ui dashboard
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
+
 	api := router.Group("/api")
 	{
-		api.GET("/hello/:name", h.Hello)
+		api.GET("/hello/:name", gin.BasicAuth(gin.Accounts{
+			"owner": "123123",
+		}), h.Hello)
+
+		auth := api.Group("/auth")
+		{
+			auth.POST("/sign-up", h.SignUp)
+			auth.POST("/sign-in", h.SignIn)
+			auth.GET("/me", h.userIdentity, h.Me)
+		}
+
+		users := api.Group("/users", h.userIdentity)
+		{
+			users.GET("/", h.GetAllUsers)
+			users.GET("/user/:name", h.GetUserByName)
+			users.GET("/:id", h.GetById)
+			//users.POST("/", h.CreateUser)
+			users.DELETE(":id", h.DeleteUserById)
+			users.PUT(":id", h.UpdateUser)
+		}
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
