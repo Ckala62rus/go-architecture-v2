@@ -2,6 +2,7 @@ package dto
 
 import (
 	"practice/domains"
+	"time"
 )
 
 type CreateUserInDTO struct {
@@ -45,8 +46,8 @@ func MapSingleUser(user domains.User) UserOutDTO {
 		Id:        user.Id,
 		Name:      user.Name,
 		Email:     user.Email,
-		CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt: user.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt: user.CreatedAt.Format(time.DateTime), // "2006-01-02 15:04:05"
+		UpdatedAt: user.UpdatedAt.Format(time.DateTime),
 	}
 
 	return usersDTO
