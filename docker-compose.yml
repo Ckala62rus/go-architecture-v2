@@ -52,6 +52,19 @@ services:
     env_file:
       - .env
 
+  go_redis:
+    image: redis:6.2.7
+    ports:
+      - "6380:6379"
+    container_name: go_redis
+    restart: always
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - go_redis:/var/lib/redis
+
 volumes:
   pgdata_go:
     name: pgdata_go
+  go_redis:
+    name: go_redis
