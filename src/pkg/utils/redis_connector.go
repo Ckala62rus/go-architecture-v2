@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"fmt"
 	"github.com/redis/go-redis/v9"
 	"time"
 )
@@ -36,6 +37,12 @@ func (cache RedisCache) SetToken(
 	token string,
 ) *redis.StatusCmd {
 	rbd := cache.getClient()
+	defer func(rbd *redis.Client) {
+		err := rbd.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(rbd)
 	res := rbd.Set(ctx, "user:1:secret_token", token, time.Second*10)
 	return res
 }
