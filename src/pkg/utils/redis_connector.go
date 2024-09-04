@@ -43,6 +43,6 @@ func (cache RedisCache) SetToken(
 			fmt.Println(err)
 		}
 	}(rbd)
-	res := rbd.Set(ctx, "user:1:secret_token", token, time.Second*10)
+	res := rbd.Set(ctx, "user:"+token, token, time.Second*30)
 	return res
 }
