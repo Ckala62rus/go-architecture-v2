@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"practice/domains"
@@ -70,6 +71,9 @@ func (h *Handler) SignIn(c *gin.Context) {
 		})
 		return
 	}
+
+	ctx := context.Background()
+	RedisCache.SetToken(ctx, token)
 
 	c.JSON(http.StatusOK, StatusResponse{
 		Status:  true,
