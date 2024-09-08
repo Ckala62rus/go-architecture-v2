@@ -16,8 +16,17 @@ func init() {
 	host := MainConfig.RedisConfig.Host
 	port := MainConfig.RedisConfig.Port
 	db := MainConfig.RedisConfig.Db
-	fmt.Println("***************** REDIS RUN *****************")
+
 	RedisDb = NewRedisCache(host+":"+port, db)
+
+	// check connection stats
+	ctx := context.Background()
+	_, err := RedisDb.getClient().Ping(ctx).Result()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("***************** REDIS RUN *****************")
 }
 
 type JWTCache interface {
