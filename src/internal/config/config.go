@@ -12,6 +12,7 @@ type Config struct {
 	ConfigFile     string `yaml:"config_file" env:"config_file" env-default:"local" env-required:"true"`
 	HttpServer     `yaml:"http_server"`
 	DatabaseConfig `yaml:"database"`
+	RedisConfig    `yaml:"redis"`
 }
 
 type HttpServer struct {
@@ -27,6 +28,12 @@ type DatabaseConfig struct {
 	User     string `yaml:"postgres_user"`
 	Password string `yaml:"postgres_password"`
 	Db       string `yaml:"postgres_db"`
+}
+
+type RedisConfig struct {
+	Host string `yaml:"redis_host"`
+	Port string `yaml:"redis_port"`
+	Db   int    `yaml:"redis_db"`
 }
 
 func MustLoad(configPath string) *Config {
