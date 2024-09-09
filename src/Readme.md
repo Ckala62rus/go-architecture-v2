@@ -38,6 +38,8 @@ swag init -g ./cmd/main.go -o ./docs; go run .\cmd\main.go
    sh bootstrap.sh
 
    docker-compose up --build --force-recreate --renew-anon-volumes
+   
+   docker-compose build --no-cache
 
 6. Документация по Gin framework https://gin-gonic.com/
 
@@ -50,3 +52,5 @@ swag init -g ./cmd/main.go -o ./docs; go run .\cmd\main.go
    6) подумать, что сделать с транзакциями. есть мысль передавать GORM прямо в метод репозитория.
    7) сделать сохранение токена JWT в редисе с временем жизни.
    8) сделать хранение токенов JWT в Redis. 
+   9) перенести инициализацию ллогера из main в сам логер.
+   10) логировать коннекты к Redis и Postgres.
