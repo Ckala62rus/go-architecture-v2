@@ -1,15 +1,18 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"practice/pkg/utils"
 	"strings"
 )
 
 const (
-	authorizationHeader = "Authorization"
-	userCtx             = "userId"
+	authorizationHeader       = "Authorization"
+	userCtx                   = "userId"
+	AuthenticationTokenHeader = "TokenHeader"
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {
@@ -26,18 +29,29 @@ func (h *Handler) userIdentity(c *gin.Context) {
 		return
 	}
 
-	userId, err := h.services.Authorization.ParseToken(headerParts[1])
+	tokenHeader := headerParts[1]
+
+	userId, err := h.services.Authorization.ParseToken(tokenHeader)
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
 
 	if userId == 0 {
-		newErrorResponse(c, http.StatusUnauthorized, "User unauthorize")
+		newErrorResponse(c, http.StatusUnauthorized, "User unauthorized")
 		return
 	}
 
+	rdb := utils.RedisDb
+	ctx := context.Background()
+	token, err := rdb.GetToken(ctx, tokenHeader)
+
+	if len(token) == 0 {
+		newErrorResponse(c, http.StatusUnauthorized, "Token has expired")
+	}
+
 	c.Set(userCtx, userId)
+	c.Set(AuthenticationTokenHeader, tokenHeader)
 }
 
 func getUserId(c *gin.Context) (int, error) {
@@ -54,4 +68,19 @@ func getUserId(c *gin.Context) (int, error) {
 	}
 
 	return idInt, nil
+}
+
+func getAuthenticationHeader(c *gin.Context) (string, error) {
+	token, ok := c.Get(AuthenticationTokenHeader)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError, "not authentication token in header")
+		return "", errors.New("authentication token not found in header")
+	}
+
+	tokenPerform, ok := token.(string)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError, "tokenPerform is of invalid type")
+		return "", errors.New("tokenPerform is of invalid type")
+	}
+	return tokenPerform, nil
 }
