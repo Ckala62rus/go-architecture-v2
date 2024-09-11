@@ -53,6 +53,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			auth.POST("/sign-up", h.SignUp)
 			auth.POST("/sign-in", h.SignIn)
 			auth.GET("/me", h.userIdentity, h.Me)
+			auth.POST("/logout", h.userIdentity, h.Logout)
 		}
 
 		users := api.Group("/users", h.userIdentity)
