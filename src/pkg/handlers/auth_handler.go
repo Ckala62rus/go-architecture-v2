@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"practice/domains"
 	"practice/pkg/dto"
+	"practice/pkg/utils"
 )
 
 // SignUp
@@ -73,7 +74,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 	}
 
 	ctx := context.Background()
-	RedisCache.SetToken(ctx, token)
+	utils.RedisDb.SetToken(ctx, token)
 
 	c.JSON(http.StatusOK, StatusResponse{
 		Status:  true,
@@ -111,5 +112,33 @@ func (h *Handler) Me(c *gin.Context) {
 		Status:  true,
 		Message: "images was updated",
 		Data:    userDTO,
+	})
+}
+
+// Logout
+// @Summary      Logout
+// @Description  logout (delete token)
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  StatusResponse
+// @Router       /auth/logout [post]
+// @Security Authorization
+func (h *Handler) Logout(c *gin.Context) {
+	token, err := getAuthenticationHeader(c)
+	if err != nil {
+		return
+	}
+
+	ctx := context.Background()
+	err = utils.RedisDb.DeleteToken(ctx, token)
+	if err != nil {
+		return
+	}
+
+	c.JSON(http.StatusOK, StatusResponse{
+		Status:  true,
+		Message: "Logout success",
+		Data:    nil,
 	})
 }
