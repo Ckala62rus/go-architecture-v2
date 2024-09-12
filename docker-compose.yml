@@ -13,6 +13,7 @@ services:
     tty: true
     depends_on:
       - db_golang
+      - go_redis
 
   # worker:
   #   container_name: worker
