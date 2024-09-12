@@ -22,6 +22,12 @@ type GetUser struct {
 // @Produce      json
 // @Router       /hello/{name} [get]
 func (h *Handler) Hello(c *gin.Context) {
+	//ctx := context.Background()
+	//res := utils.RedisDb.SetToken(ctx, "lorem ipsum dollar sit amet")
+	//fmt.Println(res)
+
+	fmt.Println("test")
+
 	var getUser GetUser
 	err := c.ShouldBindUri(&getUser)
 	if err != nil {
@@ -73,7 +79,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        name path string  true "User name"
+// @Param        name path string  true "Username"
 // @Success      200  {object}  StatusResponse
 // @Router       /users/user/{name} [get]
 // @Security Authorization
@@ -125,45 +131,6 @@ func (h *Handler) GetById(c *gin.Context) {
 		Data:    userMap,
 	})
 }
-
-// CreateUser
-// @Summary Create user
-// @Tags users
-// @Description create new user
-// @ID login
-// @Accept  json
-// @Produce  json
-// @Param input body dto.CreateUserInDTO true "credentials"
-// @Success      200  {object}  StatusResponse
-// @Router /users/ [post]
-// @Security Authorization
-//func (h *Handler) CreateUser(c *gin.Context) {
-//	var user dto.CreateUserInDTO
-//
-//	err := c.BindJSON(&user)
-//	if err != nil {
-//		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-//		return
-//	}
-//
-//	newUser, err := h.services.Users.CreateUser(domains.User{
-//		Name:     user.Name,
-//		Email:    user.Email,
-//		Password: user.Password,
-//	})
-//	if err != nil {
-//		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-//		return
-//	}
-//
-//	userMap := dto.MapSingleUser(newUser)
-//
-//	c.JSON(http.StatusOK, StatusResponse{
-//		Status:  true,
-//		Message: "one user",
-//		Data:    userMap,
-//	})
-//}
 
 // DeleteUserById
 // @Summary      Delete user by ID
