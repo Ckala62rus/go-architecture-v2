@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"practice/pkg/utils"
 	"syscall"
 )
 
@@ -13,6 +15,22 @@ const (
 	envDev   = "dev"
 	envProd  = "prod"
 )
+
+var (
+	MainLogger *slog.Logger
+)
+
+func init() {
+	projectDir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	cfg := utils.MainConfig
+
+	MainLogger = SetupNewLogger(cfg.Env, filepath.Join(projectDir, "logs", "logs.log"))
+	MainLogger.Info("***************** LOGGER INITIALIZED RUN *****************")
+}
 
 func SetupNewLogger(env string, path string) *slog.Logger {
 	var log *slog.Logger
