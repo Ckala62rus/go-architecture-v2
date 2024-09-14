@@ -2,18 +2,14 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"practice/domains"
-	config "practice/internal/config"
 	"practice/internal/logger"
 	handlers "practice/pkg/handlers"
 	"practice/pkg/repositories"
 	"practice/pkg/services"
 	"practice/pkg/utils"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 // @title           Swagger Example API
@@ -40,18 +36,12 @@ import (
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
-	// todo init config: cleanenv
-	projectDir, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-
-	cfg := config.MustLoad(filepath.Join(projectDir, "config", "local.yml"))
+	cfg := utils.MainConfig
 	//fmt.Printf("%+v", cfg) // todo need delete!
 
 	// todo init logger: slog
-	log := logger.SetupNewLogger(cfg.Env, filepath.Join(projectDir, "logs", "logs.log"))
-	log.Info("Start application!")
+	log := logger.MainLogger
+	//log.Info("Start application!")
 
 	// todo init storage: gorm
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Moscow",
@@ -66,7 +56,6 @@ func main() {
 	if cfg.Env == "local" || cfg.Env == "dev" {
 		db.Debug()
 	}
-
 	if err != nil {
 		panic(err)
 	}
@@ -76,17 +65,19 @@ func main() {
 
 	// todo init router: gin-gonic router
 	// Logging to a file.
-	// f, _ := os.Create("gin.log")
-	// gin.DefaultWriter = io.MultiWriter(f)
+	//f, _ := os.Create("gin.log")
+	//gin.DefaultWriter = io.MultiWriter(f)
 
 	rep := repositories.NewRepository(db)
 	service := services.NewService(rep)
 	handlerCollection := handlers.NewHandler(service, log)
 
-	// todo server: standart golang server
+	// todo server: standard golang server
+	out := fmt.Sprintf("server started in localhost:%s", cfg.HttpServer.Port)
+	log.Info(out)
+
 	srv := new(domains.Server)
 	if err := srv.Run(cfg.HttpServer.Port, handlerCollection.InitRoutes()); err != nil {
-		log.Debug("error occured while running http server: %s", err.Error())
+		log.Debug("error occurred while running http server: %s", err.Error())
 	}
-	fmt.Printf("server started in %s port", cfg.HttpServer.Port)
 }
