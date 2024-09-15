@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"practice/domains"
+	"practice/internal/logger"
 	"practice/pkg/dto"
 	"strconv"
 )
@@ -26,6 +27,7 @@ func (h *Handler) Hello(c *gin.Context) {
 	//res := utils.RedisDb.SetToken(ctx, "lorem ipsum dollar sit amet")
 	//fmt.Println(res)
 
+	logger.MainLogger.Info("hello handler")
 	fmt.Println("test")
 
 	var getUser GetUser
