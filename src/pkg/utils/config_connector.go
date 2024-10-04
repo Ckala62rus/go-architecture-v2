@@ -18,5 +18,5 @@ func init() {
 	}
 
 	fmt.Println("***************** CONFIG RUN *****************")
-	MainConfig = config.MustLoad(filepath.Join(projectDir, "config", "local.yml"))
+	MainConfig = config.MustLoad(filepath.Join(projectDir, "config", "config.yml"))
 }
