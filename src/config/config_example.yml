@@ -1,5 +1,5 @@
 env: "dev" # local, dev, prod
-config_file: "local.yml"
+config_file: "config.yml"
 http_server:
     address: "localhost:8081"
     port: "5000"
