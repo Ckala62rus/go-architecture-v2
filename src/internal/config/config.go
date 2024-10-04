@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	Env            string `yaml:"env" env:"ENV" env-default:"development" env-required:"true"`
-	ConfigFile     string `yaml:"config_file" env:"config_file" env-default:"local" env-required:"true"`
+	ConfigFile     string `yaml:"config_file" env:"config_file" env-default:"config" env-required:"true"`
 	HttpServer     `yaml:"http_server"`
 	DatabaseConfig `yaml:"database"`
 	RedisConfig    `yaml:"redis"`
