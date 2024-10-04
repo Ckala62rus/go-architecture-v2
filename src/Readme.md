@@ -55,4 +55,4 @@ swag init -g ./cmd/main.go -o ./docs; go run .\cmd\main.go
    9) перенести инициализацию ллогера из main в сам логер.
    10) логировать коннекты к Redis и Postgres.
 
-1
+www
