@@ -1,9 +1,10 @@
 name: Build and Publish Docker Images
 
 on:
+#  push:
+#    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
 #  check:
@@ -34,7 +35,7 @@ jobs:
 #            fi
 #          done < files.txt
 
-  go-architecture-v2:
+  build:
 #    needs: check
 #    if: needs.check.outputs.go-architecture-v2 == 'true'
     runs-on: ubuntu-latest
@@ -48,9 +49,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Publish to Registry
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
-#          context: api_go_template_service/
-          context: .
+          file: ./docker/go/DockerFile
           push: true
           tags: ckala62rus/go-template-service:latest
