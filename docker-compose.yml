@@ -3,13 +3,15 @@ version: '3.3'
 services:
   backend:
     container_name: backend
+    image: ckala62rus/go-template-service
     build:
       context: .
       dockerfile: ./docker/go/DockerFile
     ports:
       - '5000:5000'
     volumes:
-      - ./src:/src
+#      - ./src:/src
+      - ./config.yml:/src/config/config.yml
     tty: true
     depends_on:
       - db_golang
