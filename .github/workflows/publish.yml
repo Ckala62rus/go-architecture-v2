@@ -50,6 +50,7 @@ jobs:
       - name: Publish to Registry
         uses: docker/build-push-action@v2
         with:
-#          context: go-architecture-v2/
+#          context: api_go_template_service/
+          context: .
           push: true
           tags: ckala62rus/go-template-service:latest
