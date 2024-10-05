@@ -47,9 +47,9 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Publish to Registry
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
 #          context: api_go_template_service/
-          context: ./docker/go/DockerFile
+          file: ./docker/go/DockerFile
           push: true
           tags: ckala62rus/go-template-service:latest
