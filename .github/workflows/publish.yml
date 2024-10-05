@@ -50,6 +50,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
 #          context: api_go_template_service/
-          context: .docker/go/DockerFile
+          context: ./docker/go/DockerFile
           push: true
           tags: ckala62rus/go-template-service:latest
