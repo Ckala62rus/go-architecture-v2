@@ -61,7 +61,7 @@ func main() {
 	}
 
 	// Run migration initialize
-	utils.AutoMigrateInitialize(db, log)
+	utils.AutoMigrateInitialize(db, log, cfg.Env)
 
 	// todo init router: gin-gonic router
 	// Logging to a file.

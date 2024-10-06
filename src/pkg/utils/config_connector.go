@@ -17,6 +17,6 @@ func init() {
 		panic(err)
 	}
 
-	fmt.Println("test***************** CONFIG RUN *****************")
+	fmt.Println("***************** CONFIG RUN *****************")
 	MainConfig = config.MustLoad(filepath.Join(projectDir, "config", "config.yml"))
 }
