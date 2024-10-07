@@ -15,16 +15,18 @@ services:
       - db_golang
       - go_redis
 
-  # worker:
-  #   container_name: worker
-  #   build:
-  #     context: .
-  #     dockerfile: ./docker/worker/DockerFile
-  #   volumes:
-  #     - ./src:/src
-  #   depends_on:
-  #     - db_golang
-  #     - backend
+  worker:
+    container_name: worker
+    image: ckala62rus/go-template-worker
+    build:
+      context: .
+      dockerfile: ./docker/worker/DockerFile
+    volumes:
+#      - ./src:/src
+      - ./config.yml:/src/config/config.yml
+    depends_on:
+      - db_golang
+      - backend
 
   # supervisor-go:
   #   container_name: supervisor-go

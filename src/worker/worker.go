@@ -5,6 +5,7 @@ import (
 	"github.com/robfig/cron/v3"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -36,12 +37,12 @@ func main() {
 	<-sig
 }
 
-func GetServiceForTask() *services.Service {
+func GetDB() *gorm.DB {
 	projectDir, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
-	cfg := config.MustLoad(filepath.Join(projectDir, "config", "local.yml"))
+	cfg := config.MustLoad(filepath.Join(projectDir, "config", "config.yml"))
 	//fmt.Printf("%+v", cfg) // todo need delete!
 
 	// todo init storage: gorm
@@ -60,8 +61,9 @@ func GetServiceForTask() *services.Service {
 	if err != nil {
 		panic(err)
 	}
-	repo := repositories.NewRepository(db)
-	return services.NewService(repo)
+	//repo := repositories.NewRepository(db)
+	//return services.NewService(repo)
+	return db
 }
 
 func work() {
@@ -69,7 +71,17 @@ func work() {
 }
 
 func work2() {
-	service := GetServiceForTask()
+	db := GetDB()
+	sqlDB, err := db.DB()
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer sqlDB.Close()
+
+	repo := repositories.NewRepository(db)
+	service := services.NewService(repo)
+
 	user := service.Users.GetAllUsers()
 	fmt.Printf("get user with name: %v \n", user)
 }
