@@ -14,8 +14,8 @@ RUN cd /src go mod tidy
 
 CMD ["dos2unix", "bootstrap_worker.sh"]
 
-RUN go build -o worker ./worker/worker.go && chmod 777 ./cmd/app
-# RUN chmod 777 ./cmd/app
+RUN go build -o worker ./worker/worker.go
+RUN chmod 777 ./worker/worker
 
 FROM alpine:3.14
 
