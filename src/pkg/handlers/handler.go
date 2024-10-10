@@ -44,9 +44,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	api := router.Group("/api")
 	{
-		api.GET("/hello/:name", gin.BasicAuth(gin.Accounts{
-			"owner": "123123",
-		}), h.Hello)
+		//api.GET("/hello/:name", gin.BasicAuth(gin.Accounts{
+		//	"owner": "123123",
+		//}), h.Hello)
+
+		api.GET("/hello/:name", h.Hello)
 
 		auth := api.Group("/auth")
 		{
