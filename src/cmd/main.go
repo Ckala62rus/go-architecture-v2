@@ -12,7 +12,7 @@ import (
 	"practice/pkg/utils"
 )
 
-// @title           Swagger Example API
+// @title           Swagger Example API wwwwwwwwwwwwwww
 // @version         1.0
 // @description     This is a sample server celler server.
 // @termsOfService  http://swagger.io/terms/
