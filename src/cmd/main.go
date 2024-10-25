@@ -42,6 +42,7 @@ func main() {
 	// todo init logger: slog
 	log := logger.MainLogger
 	//log.Info("Start application!")
+	log.Info("***********************************************************")
 
 	// todo init storage: gorm
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Moscow",
