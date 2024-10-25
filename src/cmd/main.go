@@ -12,7 +12,7 @@ import (
 	"practice/pkg/utils"
 )
 
-// @title           Swagger Example API wwwwwwwwwwwwwww
+// @title           Swagger Example API
 // @version         1.0
 // @description     This is a sample server celler server.
 // @termsOfService  http://swagger.io/terms/
@@ -42,6 +42,7 @@ func main() {
 	// todo init logger: slog
 	log := logger.MainLogger
 	//log.Info("Start application!")
+	log.Info("***********************************************************")
 
 	// todo init storage: gorm
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Moscow",
