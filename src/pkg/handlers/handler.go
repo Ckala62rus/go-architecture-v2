@@ -27,7 +27,23 @@ func NewHandler(services *services.Service, log *slog.Logger) *Handler {
 	}
 }
 
-// @Summary      Testing route
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
+}
+
+// InitRoutes @Summary      Testing route
 // @Description  get test json response
 // @Param name   path string true "user name"
 // @Tags         Testing
@@ -36,6 +52,8 @@ func NewHandler(services *services.Service, log *slog.Logger) *Handler {
 // @Router       /hello/{name} [get]
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+
+	router.Use(CORSMiddleware())
 
 	// redirect on swagger ui dashboard
 	router.GET("/", func(c *gin.Context) {
