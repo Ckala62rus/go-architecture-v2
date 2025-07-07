@@ -43,13 +43,7 @@ func CORSMiddleware() gin.HandlerFunc {
 	}
 }
 
-// InitRoutes @Summary      Testing route
-// @Description  get test json response
-// @Param name   path string true "user name"
-// @Tags         Testing
-// @Accept       json
-// @Produce      json
-// @Router       /hello/{name} [get]
+// InitRoutes инициализирует маршруты для API
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
