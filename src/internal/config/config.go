@@ -13,6 +13,7 @@ type Config struct {
 	HttpServer     `yaml:"http_server"`
 	DatabaseConfig `yaml:"database"`
 	RedisConfig    `yaml:"redis"`
+	SecurityConfig `yaml:"security"`
 }
 
 type HttpServer struct {
@@ -36,6 +37,10 @@ type RedisConfig struct {
 	Db   int    `yaml:"redis_db"`
 }
 
+type SecurityConfig struct {
+	JWTSigningKey string `yaml:"jwt_signing_key" env:"JWT_SIGNING_KEY" env-required:"true"`
+}
+
 func MustLoad(configPath string) *Config {
 	//configPath := os.Getenv("CONFIG_PATH")
 
@@ -48,6 +53,15 @@ func MustLoad(configPath string) *Config {
 	err := cleanenv.ReadConfig(configPath, &cfg)
 	if err != nil {
 		log.Fatalf("cannot read config: %s", err)
+	}
+
+	// Валидация критически важных секретов
+	if cfg.SecurityConfig.JWTSigningKey == "" {
+		log.Fatal("JWT_SIGNING_KEY is required but not set")
+	}
+
+	if len(cfg.SecurityConfig.JWTSigningKey) < 32 {
+		log.Fatal("JWT_SIGNING_KEY must be at least 32 characters long")
 	}
 
 	return &cfg
