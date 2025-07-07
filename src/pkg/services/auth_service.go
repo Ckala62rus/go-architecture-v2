@@ -2,16 +2,15 @@ package services
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
 	"practice/domains"
 	"practice/pkg/repositories"
 	"practice/pkg/utils"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 const (
-	salt       = "qweasdzxc" // хорошая практика добавлять соль к паролю
-	signingKey = "qweasadasfasfasfsfafasf"
 	// tokenTTL   = 12 * time.Hour
 	tokenTTL = 10 * time.Minute
 )
@@ -32,47 +31,52 @@ func NewAuthService(
 }
 
 func (s *AuthService) CreateUser(user domains.User) (int, error) {
-	user.Password = utils.GeneratePasswordHash(user.Password)
-	user, err := s.auth.CreateUser(user)
-
+	hashedPassword, err := utils.GeneratePasswordHash(user.Password)
 	if err != nil {
 		return 0, err
 	}
-	return user.Id, nil
+	user.Password = hashedPassword
+
+	createdUser, err := s.auth.CreateUser(user)
+	if err != nil {
+		return 0, err
+	}
+	return createdUser.Id, nil
 }
 
 func (s *AuthService) GenerateToken(email, password string) (string, error) {
 	user, err := s.user.GetUserByEmail(email)
 
 	if user.Id == 0 {
-		return "User not found", err
+		return "", errors.New("User not found")
 	}
 	if err != nil {
 		return "", err
 	}
 
-	inputPasswordHash := utils.GeneratePasswordHash(password)
-
-	if inputPasswordHash != user.Password {
+	// Проверяем пароль используя bcrypt
+	if err := utils.ComparePasswordHash(user.Password, password); err != nil {
 		return "", errors.New("Password is not equal")
 	}
 
+	// Создаем JWT токен с новой структурой claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &utils.TokenClaims{
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
-			IssuedAt:  time.Now().Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenTTL)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
-		user.Id,
+		UserId: user.Id,
 	})
 
-	token_created, err := token.SignedString([]byte(signingKey))
+	signingKey := utils.GetSigningKey()
+	tokenString, err := token.SignedString([]byte(signingKey))
 	if err != nil {
 		return "", err
 	}
 
 	// todo save token in Redis
 
-	return token_created, nil
+	return tokenString, nil
 }
 
 func (s *AuthService) ParseToken(accessToken string) (int, error) {
@@ -81,10 +85,10 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 			return nil, errors.New("invalid signing method")
 		}
 
-		return []byte(signingKey), nil
+		return []byte(utils.GetSigningKey()), nil
 	})
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	claims, ok := token.Claims.(*utils.TokenClaims)

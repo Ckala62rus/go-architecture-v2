@@ -6,24 +6,29 @@ http_server:
     timeout: 4s # время соединения, за какое сервер должен вернуть результат
     idle_timeout: 60s # время жизни соединения, на случай если клиент снова обратиться к серверу
 database:
-    # localhost для запуска без docker
-    postgres_host: "localhost"
-    postgres_port: "5433"
+    # db_golang когда запускаем в Docker.
+    postgres_host: "db_golang"
+    postgres_port: "5432"
     postgres_user: "postgres"
     postgres_password: "postgres"
     postgres_db: "db"
 #database:
-#    # db_golang когда запускаем в Docker.
-#    postgres_host: "db_golang"
-#    postgres_port: "5432"
+#    # localhost для запуска без docker
+#    postgres_host: "localhost"
+#    postgres_port: "5433"
 #    postgres_user: "postgres"
 #    postgres_password: "postgres"
 #    postgres_db: "db"
 redis:
-    redis_host: "localhost"
-    redis_port: "6380"
+    redis_host: "go_redis"
+    redis_port: "6379"
     redis_db: 0
 #redis:
-#    redis_host: "go_redis"
-#    redis_port: "6379"
+#    redis_host: "localhost"
+#    redis_port: "6380"
 #    redis_db: 0
+
+security:
+    # ВАЖНО: В production используйте переменную окружения JWT_SIGNING_KEY
+    # Ключ должен быть минимум 32 символа для безопасности
+    jwt_signing_key: "development_key_32_characters_long"
