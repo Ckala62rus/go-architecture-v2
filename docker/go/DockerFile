@@ -1,35 +1,65 @@
-FROM golang:1.22.0-alpine as builder
-LABEL authors="Ckala"
-WORKDIR /src
+# Build stage
+FROM golang:1.22.0-alpine AS builder
 
-ADD src/ /src/
+LABEL maintainer="Ckala"
 
-# COPY ./config.yml /src/config/config.yml
-# COPY ./src/bootstrap_app.sh bootstrap_app.sh
+# Установка зависимостей для сборки
+RUN apk update && apk add --no-cache \
+    git \
+    ca-certificates \
+    curl \
+    && rm -rf /var/cache/apk/*
 
-# ENV CGO_ENABLED=0
-# ENV GOPROXY=http://localhost:8081/repository/goproxy/
+# Настройка рабочей директории
+WORKDIR /app
 
-RUN apk update
-RUN apk add gcompat mc curl
+# Копирование файлов зависимостей
+COPY src/go.mod src/go.sum ./
 
-RUN cd /src go mod tidy
+# Загрузка зависимостей
+RUN go mod download
 
+# Копирование исходного кода
+COPY src/ .
 
-CMD ["dos2unix", "bootstrap_app.sh"]
-
+# Установка swag для генерации документации
 RUN go install github.com/swaggo/swag/cmd/swag@latest
+
+# Генерация Swagger документации
 RUN swag init -g ./cmd/main.go -o ./docs
 
-RUN go build -o ./cmd/app ./cmd/main.go
-RUN chmod 777 ./cmd/app
-# RUN ./cmd/app
-# ENTRYPOINT ["sh", "bootstrap_app.sh"]
-# CMD ["./cmd/app"]
+# Сборка приложения
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -a -installsuffix cgo \
+    -ldflags '-extldflags "-static"' \
+    -o app ./cmd/main.go
 
-FROM alpine:3.14
+# Production stage
+FROM alpine:3.18
 
-WORKDIR /src
+# Установка необходимых сертификатов и создание пользователя
+RUN apk --no-cache add ca-certificates tzdata \
+    && addgroup -g 1001 appgroup \
+    && adduser -u 1001 -G appgroup -s /bin/sh -D appuser
 
-COPY --from=builder /src /src
-CMD ["./cmd/app"]
+WORKDIR /app
+
+# Копирование бинарного файла из builder stage
+COPY --from=builder /app/app .
+COPY --from=builder /app/docs ./docs
+
+# Настройка прав доступа
+RUN chown -R appuser:appgroup /app
+
+# Переключение на non-root пользователя
+USER appuser
+
+# Открытие порта
+EXPOSE 5000
+
+# Проверка здоровья приложения
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:5000/api/hello/healthcheck || exit 1
+
+# Запуск приложения
+CMD ["./app"]
