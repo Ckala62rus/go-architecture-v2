@@ -1,13 +1,13 @@
 package logger
 
 import (
-	"gopkg.in/natefinch/lumberjack.v2"
 	"log/slog"
 	"os"
 	"os/signal"
 	"path/filepath"
-	"practice/pkg/utils"
 	"syscall"
+
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 const (
@@ -26,9 +26,13 @@ func init() {
 		panic(err)
 	}
 
-	cfg := utils.MainConfig
+	// Используем ENV переменную или значение по умолчанию
+	env := os.Getenv("ENV")
+	if env == "" {
+		env = "dev"
+	}
 
-	MainLogger = SetupNewLogger(cfg.Env, filepath.Join(projectDir, "logs", "logs.log"))
+	MainLogger = SetupNewLogger(env, filepath.Join(projectDir, "logs", "logs.log"))
 	MainLogger.Info("***************** LOGGER INITIALIZED RUN *****************")
 }
 
@@ -57,10 +61,13 @@ func SetupNewLogger(env string, path string) *slog.Logger {
 	case envLocal:
 		//log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 		log = slog.New(slog.NewJSONHandler(f, &slog.HandlerOptions{Level: slog.LevelDebug}))
-	case envDev:
+	case envDev, "development":
 		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-	case envProd:
+	case envProd, "production":
 		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	default:
+		// Fallback to dev mode for unknown environments
+		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	}
 
 	//log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})) // log to console
