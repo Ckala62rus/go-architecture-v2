@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"crypto/sha1"
-	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -15,13 +15,22 @@ const (
 )
 
 type TokenClaims struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 	UserId int `json:"user_id"`
 }
 
-func GeneratePasswordHash(password string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
+func GeneratePasswordHash(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), nil
+}
 
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+func ComparePasswordHash(hashedPassword, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+}
+
+func GetSigningKey() string {
+	return signingKey
 }
