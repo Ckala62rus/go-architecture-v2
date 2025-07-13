@@ -60,3 +60,28 @@ swag init -g ./cmd/main.go -o ./docs; go run .\cmd\main.go
 ```bash
 go test ./tests/... -v
 ```
+
+8. Создание бэкапа базы Postgres в Windows 10. Простой бэкап без временной метки:
+
+```shell
+docker exec db_golang pg_dump -U postgres -d db > docker\backup\db\backup.sql
+```
+
+9. Удаления Volume базы Postgres
+
+```shell
+docker volume rm pgdata_go --force
+```
+
+или полная очистка и перезапуск
+```shell
+docker-compose down && docker volume rm pgdata_go && docker-compose up -d db_golang
+```
+
+10. Восстановление базы Postgres из бэкапа.
+
+```shell
+type "docker\backup\db\backup.sql" | docker exec -i db_golang psql -U postgres -d db
+```
+
+docker exec db_golang pg_restore -U postgres -d db \docker\backup\db\backup_20240101_120000.dump

@@ -2,32 +2,35 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"practice/domains"
-	"practice/internal/logger"
 	"practice/pkg/dto"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type GetUser struct {
 	Name string `uri:"name" binding:"required"`
 }
 
-// Hello
-// @Summary      Testing route
-// @Description  get test json response
-// @Param name   path string true "username"
-// @Tags         Testing
+// Hello тестовый endpoint
+// @Summary      Тестовый маршрут
+// @Description  Возвращает тестовый JSON ответ с переданным именем. Используется для проверки работоспособности API.
+// @Tags         Тестирование
 // @Accept       json
 // @Produce      json
+// @Param        name path string true "Имя пользователя для приветствия"
+// @Success      200  {object}  StatusResponse{data=string} "Успешный ответ"
 // @Router       /hello/{name} [get]
 func (h *Handler) Hello(c *gin.Context) {
 	//ctx := context.Background()
 	//res := utils.RedisDb.SetToken(ctx, "lorem ipsum dollar sit amet")
 	//fmt.Println(res)
 
-	logger.MainLogger.Info("hello handler")
+	//logger.MainLogger.Info("hello handler")
+	h.log.Debug("#Debug hello handler")
+	h.log.Info("#Info hello handler")
 	fmt.Println("test")
 
 	var getUser GetUser
@@ -42,15 +45,17 @@ func (h *Handler) Hello(c *gin.Context) {
 	})
 }
 
-// GetAllUsers
-// @Summary      Get all users
-// @Description  return all users
-// @Tags         users
+// GetAllUsers возвращает всех пользователей
+// @Summary      Получить всех пользователей
+// @Description  Возвращает список всех пользователей в системе. Требует авторизации.
+// @Tags         Пользователи
 // @Accept       json
 // @Produce      json
-// @Success      200  {object}  StatusResponse
+// @Success      200  {object}  StatusResponse{data=[]dto.UserOutDTO} "Список пользователей"
+// @Failure      401  {object}  ErrorResponse "Не авторизован или токен недействителен"
+// @Failure      500  {object}  ErrorResponse "Внутренняя ошибка сервера"
 // @Router       /users/ [get]
-// @Security Authorization
+// @Security     BearerAuth
 func (h *Handler) GetAllUsers(c *gin.Context) {
 	users := h.services.Users.GetAllUsers()
 	//var usersDTO []dto.AllUsersOutDTO
@@ -75,16 +80,19 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 	})
 }
 
-// GetUserByName
-// @Summary      Get user by Name
-// @Description  get user by Name
-// @Tags         users
+// GetUserByName получает пользователя по имени
+// @Summary      Получить пользователя по имени
+// @Description  Возвращает информацию о пользователе по его имени. Требует авторизации.
+// @Tags         Пользователи
 // @Accept       json
 // @Produce      json
-// @Param        name path string  true "Username"
-// @Success      200  {object}  StatusResponse
+// @Param        name path string true "Имя пользователя для поиска"
+// @Success      200  {object}  StatusResponse{data=dto.UserOutDTO} "Информация о пользователе"
+// @Failure      401  {object}  ErrorResponse "Не авторизован или токен недействителен"
+// @Failure      404  {object}  ErrorResponse "Пользователь не найден"
+// @Failure      500  {object}  ErrorResponse "Внутренняя ошибка сервера"
 // @Router       /users/user/{name} [get]
-// @Security Authorization
+// @Security     BearerAuth
 func (h *Handler) GetUserByName(c *gin.Context) {
 	name := c.Param("name")
 	user, err := h.services.Users.GetUserByName(name)
@@ -101,16 +109,20 @@ func (h *Handler) GetUserByName(c *gin.Context) {
 	})
 }
 
-// GetById
-// @Summary      Get user by ID
-// @Description  get user by ID
-// @Tags         users
+// GetById получает пользователя по ID
+// @Summary      Получить пользователя по ID
+// @Description  Возвращает информацию о пользователе по его уникальному идентификатору. Требует авторизации.
+// @Tags         Пользователи
 // @Accept       json
 // @Produce      json
-// @Param        id   path      int  true  "User ID"
-// @Success      200  {object}  StatusResponse
+// @Param        id path int true "Уникальный идентификатор пользователя"
+// @Success      200  {object}  StatusResponse{data=dto.UserOutDTO} "Информация о пользователе"
+// @Failure      400  {object}  ErrorResponse "Некорректный ID пользователя"
+// @Failure      401  {object}  ErrorResponse "Не авторизован или токен недействителен"
+// @Failure      404  {object}  ErrorResponse "Пользователь не найден"
+// @Failure      500  {object}  ErrorResponse "Внутренняя ошибка сервера"
 // @Router       /users/{id} [get]
-// @Security Authorization
+// @Security     BearerAuth
 func (h *Handler) GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -134,16 +146,20 @@ func (h *Handler) GetById(c *gin.Context) {
 	})
 }
 
-// DeleteUserById
-// @Summary      Delete user by ID
-// @Description  Delete user by ID
-// @Tags         users
+// DeleteUserById удаляет пользователя по ID
+// @Summary      Удалить пользователя по ID
+// @Description  Удаляет пользователя из системы по его уникальному идентификатору. Требует авторизации.
+// @Tags         Пользователи
 // @Accept       json
 // @Produce      json
-// @Param        id   path      int  true  "User ID"
-// @Success      200  {object}  StatusResponse
+// @Param        id path int true "Уникальный идентификатор пользователя для удаления"
+// @Success      200  {object}  StatusResponse{data=string} "Пользователь успешно удалён"
+// @Failure      400  {object}  ErrorResponse "Некорректный ID пользователя"
+// @Failure      401  {object}  ErrorResponse "Не авторизован или токен недействителен"
+// @Failure      404  {object}  ErrorResponse "Пользователь не найден"
+// @Failure      500  {object}  ErrorResponse "Внутренняя ошибка сервера"
 // @Router       /users/{id} [delete]
-// @Security Authorization
+// @Security     BearerAuth
 func (h *Handler) DeleteUserById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -163,18 +179,21 @@ func (h *Handler) DeleteUserById(c *gin.Context) {
 	})
 }
 
-// UpdateUser
-// @Summary 	 Update user by id
-// @Tags         users
-// @Description  update user
-// @ID login
+// UpdateUser обновляет данные пользователя
+// @Summary      Обновить пользователя по ID
+// @Description  Обновляет информацию о пользователе по его уникальному идентификатору. Требует авторизации.
+// @Tags         Пользователи
 // @Accept       json
 // @Produce      json
-// @Param        id path int true "User ID"
-// @Param 	     input body dto.UpdateUserInDTO true "credentials"
-// @Success      200  {object}  StatusResponse
+// @Param        id path int true "Уникальный идентификатор пользователя"
+// @Param        input body dto.UpdateUserInDTO true "Данные для обновления пользователя"
+// @Success      200  {object}  StatusResponse{data=dto.UserOutDTO} "Пользователь успешно обновлён"
+// @Failure      400  {object}  ErrorResponse "Некорректный ID пользователя или данные запроса"
+// @Failure      401  {object}  ErrorResponse "Не авторизован или токен недействителен"
+// @Failure      404  {object}  ErrorResponse "Пользователь не найден"
+// @Failure      500  {object}  ErrorResponse "Внутренняя ошибка сервера"
 // @Router       /users/{id} [put]
-// @Security Authorization
+// @Security     BearerAuth
 func (h *Handler) UpdateUser(c *gin.Context) {
 	var user dto.UpdateUserInDTO
 

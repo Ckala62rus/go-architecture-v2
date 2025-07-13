@@ -2,9 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/robfig/cron/v3"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"os"
 	"os/signal"
@@ -12,6 +9,10 @@ import (
 	"practice/internal/config"
 	"practice/pkg/repositories"
 	"practice/pkg/services"
+
+	"github.com/robfig/cron/v3"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -32,7 +33,7 @@ func main() {
 	go c.Start()
 
 	// for run forever
-	sig := make(chan os.Signal)
+	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, os.Kill)
 	<-sig
 }

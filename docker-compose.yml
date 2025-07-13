@@ -8,25 +8,63 @@ services:
     ports:
       - '5000:5000'
     volumes:
-#      - ./src:/src
-      - ./config.yml:/src/config/config.yml
-    tty: true
+      - ./config_example.yml:/app/config/config.yml:ro
+    environment:
+      - JWT_SIGNING_KEY=${JWT_SIGNING_KEY:-development_key_32_characters_long}
+      - ENV=${ENV:-development}
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5000/api/hello/test"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     depends_on:
-      - db_golang
-      - go_redis
+      db_golang:
+        condition: service_healthy
+      go_redis:
+        condition: service_healthy
+    networks:
+      - app-network
 
-  worker:
-    container_name: worker
-    image: ckala62rus/go-template-worker
+  nginx-golang:
+    image: nginx:1.25-alpine
+    container_name: nginx-golang
     build:
       context: .
-      dockerfile: ./docker/worker/DockerFile
+      dockerfile: ./docker/nginx/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-#      - ./src:/src
-      - ./config.yml:/src/config/config.yml
+      - nginx_logs:/var/log/nginx
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/api/hello/test"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     depends_on:
-      - db_golang
-      - backend
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+
+#  worker:
+#    container_name: worker
+#    image: ckala62rus/go-template-worker
+#    build:
+#      context: .
+#      dockerfile: ./docker/worker/DockerFile
+#    volumes:
+##      - ./src:/src
+#      - ./config.yml:/src/config/config.yml
+#    depends_on:
+#      - db_golang
+#      - backend
 
   # supervisor-go:
   #   container_name: supervisor-go
@@ -45,29 +83,64 @@ services:
 
   db_golang:
     container_name: db_golang
-    image: postgres:14.1-alpine
-    #    restart: always
+    image: postgres:15.4-alpine
+    restart: unless-stopped
     ports:
-      - '5433:5432'
+      - "5433:5432"
     volumes:
       - pgdata_go:/var/lib/postgresql/data
-      - ./docker/backup/db:/tmp/db
+      - postgres_backup:/tmp/backup
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-db}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - app-network
 
   go_redis:
-    image: redis:6.2.7
+    image: redis:7.2-alpine
+    container_name: go_redis
     ports:
       - "6380:6379"
-    container_name: go_redis
-    restart: always
+    restart: unless-stopped
     environment:
       - TZ=Europe/Moscow
     volumes:
-      - go_redis:/var/lib/redis
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks:
+      - app-network
 
 volumes:
   pgdata_go:
+    driver: local
     name: pgdata_go
-  go_redis:
-    name: go_redis
+  redis_data:
+    driver: local
+    name: redis_data
+  nginx_logs:
+    driver: local
+    name: nginx_logs
+  postgres_backup:
+    driver: local
+    name: postgres_backup
+
+networks:
+  app-network:
+    driver: bridge
+    name: go-template-network
