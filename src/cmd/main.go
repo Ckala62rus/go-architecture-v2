@@ -2,39 +2,39 @@ package main
 
 import (
 	"fmt"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"practice/domains"
 	"practice/internal/logger"
 	handlers "practice/pkg/handlers"
 	"practice/pkg/repositories"
 	"practice/pkg/services"
 	"practice/pkg/utils"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-// @title           Swagger Example API
-// @version         1.0
-// @description     This is a sample server celler server.
+// @title           Go Template API
+// @version         1.0.0
+// @description     RESTful API сервер на Go с использованием Gin, PostgreSQL, Redis, JWT аутентификацией и чистой архитектурой
 // @termsOfService  http://swagger.io/terms/
 
 // @contact.name   API Support
-// @contact.url    http://www.swagger.io/support
-// @contact.email  support@swagger.io
+// @contact.url    https://github.com/your-username/practice
+// @contact.email  support@yourcompany.com
 
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
 
 // @host      localhost:5000
 // @BasePath  /api
 
-// @securityDefinitions.basic  BasicAuth
-
-// @securityDefinitions.apikey Authorization
+// @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
+// @description JWT токен с префиксом "Bearer " (например: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
 
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
+// @externalDocs.description  GitHub Repository
+// @externalDocs.url          https://github.com/your-username/practice
 func main() {
 	cfg := utils.MainConfig
 	//fmt.Printf("%+v", cfg) // todo need delete!
@@ -79,6 +79,6 @@ func main() {
 
 	srv := new(domains.Server)
 	if err := srv.Run(cfg.HttpServer.Port, handlerCollection.InitRoutes()); err != nil {
-		log.Debug("error occurred while running http server: %s", err.Error())
+		log.Debug("error occurred while running http server", "error", err.Error())
 	}
 }
