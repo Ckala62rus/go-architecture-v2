@@ -2,21 +2,24 @@ package handlers
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"practice/domains"
 	"practice/pkg/dto"
 	"practice/pkg/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
-// SignUp
-// @Summary      Authentication in system
-// @Description  return id created user
-// @Tags         auth
+// SignUp регистрирует нового пользователя в системе
+// @Summary      Регистрация нового пользователя
+// @Description  Создаёт нового пользователя с указанными email и паролем. Возвращает ID созданного пользователя.
+// @Tags         Аутентификация
 // @Accept       json
 // @Produce      json
-// @Param input body dto.CreateAuthUser true "credentials"
-// @Success      200  {object}  StatusResponse
+// @Param        input body dto.CreateAuthUser true "Данные для регистрации пользователя"
+// @Success      200  {object}  StatusResponse{data=int} "Успешная регистрация"
+// @Failure      400  {object}  ErrorResponse "Некорректные данные запроса"
+// @Failure      500  {object}  ErrorResponse "Внутренняя ошибка сервера"
 // @Router       /auth/sign-up [post]
 func (h *Handler) SignUp(c *gin.Context) {
 	var input dto.CreateAuthUser
@@ -43,15 +46,18 @@ func (h *Handler) SignUp(c *gin.Context) {
 	})
 }
 
-// SignIn
-// @Summary Login
-// @Description login and return authorization bearer token
-// @Tags auth
-// @Accept  json
-// @Produce  json
-// @Param input body dto.SignInInput true "credentials"
-// @Success	200  {object}  StatusResponse
-// @Router /auth/sign-in [post]
+// SignIn авторизует пользователя в системе
+// @Summary      Авторизация пользователя
+// @Description  Авторизует пользователя по email и паролю. Возвращает JWT токен для доступа к защищённым маршрутам.
+// @Tags         Аутентификация
+// @Accept       json
+// @Produce      json
+// @Param        input body dto.SignInInput true "Данные для входа в систему"
+// @Success      200  {object}  StatusResponse{data=object{token=string}} "Успешная авторизация"
+// @Failure      400  {object}  ErrorResponse "Некорректные данные запроса"
+// @Failure      401  {object}  ErrorResponse "Неверный email или пароль"
+// @Failure      500  {object}  ErrorResponse "Внутренняя ошибка сервера"
+// @Router       /auth/sign-in [post]
 func (h *Handler) SignIn(c *gin.Context) {
 	var input dto.SignInInput
 
@@ -85,16 +91,18 @@ func (h *Handler) SignIn(c *gin.Context) {
 	})
 }
 
-// Me
-// @Summary 	 User information
-// @Tags         auth
-// @Description  get authorization user information by id
+// Me возвращает информацию о текущем пользователе
+// @Summary      Информация о текущем пользователе
+// @Description  Возвращает информацию о пользователе на основе JWT токена. Требует авторизации.
+// @Tags         Аутентификация
 // @Accept       json
 // @Produce      json
-// @Success      200  {object}  StatusResponse
-// @Failure      401 {object} ErrorResponse
+// @Success      200  {object}  StatusResponse{data=dto.UserOutDTO} "Информация о пользователе"
+// @Failure      401  {object}  ErrorResponse "Не авторизован или токен недействителен"
+// @Failure      404  {object}  ErrorResponse "Пользователь не найден"
+// @Failure      500  {object}  ErrorResponse "Внутренняя ошибка сервера"
 // @Router       /auth/me [get]
-// @Security Authorization
+// @Security     BearerAuth
 func (h *Handler) Me(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -115,15 +123,17 @@ func (h *Handler) Me(c *gin.Context) {
 	})
 }
 
-// Logout
-// @Summary      Logout
-// @Description  logout (delete token)
-// @Tags         auth
+// Logout выход из системы
+// @Summary      Выход из системы
+// @Description  Выполняет выход пользователя из системы путём удаления JWT токена из Redis. Требует авторизации.
+// @Tags         Аутентификация
 // @Accept       json
 // @Produce      json
-// @Success      200  {object}  StatusResponse
+// @Success      200  {object}  StatusResponse "Успешный выход"
+// @Failure      401  {object}  ErrorResponse "Не авторизован или токен недействителен"
+// @Failure      500  {object}  ErrorResponse "Внутренняя ошибка сервера"
 // @Router       /auth/logout [post]
-// @Security Authorization
+// @Security     BearerAuth
 func (h *Handler) Logout(c *gin.Context) {
 	token, err := getAuthenticationHeader(c)
 	if err != nil {
