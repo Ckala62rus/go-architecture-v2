@@ -61,6 +61,18 @@ swag init -g ./cmd/main.go -o ./docs; go run .\cmd\main.go
 go test ./tests/... -v
 ```
 
+Команды для генерации моков:
+
+Генерация мока для конкретного интерфейса:
+mockery --name=Users --dir=pkg/repositories --output=tests/mocks
+
+Генерация моков для всех интерфейсов в директории:
+mockery --all --dir=pkg/repositories --output=tests/mocks
+
+Генерация с конфигурацией:
+mockery --config .mockery.yaml
+
+
 8. Создание бэкапа базы Postgres в Windows 10. Простой бэкап без временной метки:
 
 ```shell

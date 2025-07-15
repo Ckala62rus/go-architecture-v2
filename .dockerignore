@@ -1,0 +1,79 @@
+# Git
+.git
+.gitignore
+README.md
+*.md
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+log/
+logs/
+src/logs/
+
+# Test files
+*_test.go
+src/tests/
+coverage.out
+
+# Development tools
+.air.toml
+hot-reload*
+
+# Documentation
+docs/
+!src/docs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Node.js (if any)
+node_modules/
+npm-debug.log
+
+# Docker files
+Dockerfile*
+docker-compose*
+!docker/
+
+# Build artifacts
+*.exe
+*.exe~
+*.so
+*.dylib
+bin/
+dist/
+
+# Backup files
+*.bak
+*.backup
+
+# Development config
+config.yml
+!config_example.yml
+
+# IDE specific
+.vscode/settings.json
+.history/ 
