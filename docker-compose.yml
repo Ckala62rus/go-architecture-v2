@@ -1,12 +1,12 @@
 services:
   backend:
-    container_name: backend
+#    container_name: backend
     image: ckala62rus/go-template-service
     build:
       context: .
       dockerfile: ./docker/go/DockerFile
-    ports:
-      - '5000:5000'
+#    ports:
+#      - '5000:5000'
     volumes:
       - ./config_example.yml:/app/config/config.yml:ro
     environment:
@@ -15,41 +15,44 @@ services:
     env_file:
       - .env
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5000/api/hello/test"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    deploy:
+      replicas: 4
+    # healthcheck:
+    #   test: ["CMD", "wget", "-q", "--spider", "http://localhost:5000/api/hello/test"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
     depends_on:
-      db_golang:
-        condition: service_healthy
-      go_redis:
-        condition: service_healthy
+      - db_golang
+      - go_redis
     networks:
       - app-network
 
   nginx-golang:
     image: nginx:1.25-alpine
-    container_name: nginx-golang
     build:
       context: .
       dockerfile: ./docker/nginx/Dockerfile
+    container_name: nginx-golang
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - nginx_logs:/var/log/nginx
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/api/hello/test"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/cert/cert.pem:/etc/nginx/ssl/cert.pem:ro
+      - ./docker/cert/key.pem:/etc/nginx/ssl/key.pem:ro
+#    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/api/hello/test"]
+#      interval: 30s
+#      timeout: 5s
+#      retries: 3
+#      start_period: 10s
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     networks:
       - app-network
 
@@ -83,13 +86,14 @@ services:
 
   db_golang:
     container_name: db_golang
-    image: postgres:15.4-alpine
+    image: postgres:16.3-alpine3.20
     restart: unless-stopped
     ports:
       - "5433:5432"
     volumes:
       - pgdata_go:/var/lib/postgresql/data
       - postgres_backup:/tmp/backup
+      - ./docker/db_conf/postgresql.conf:/etc/postgresql/postgresql.conf
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-db}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
@@ -97,12 +101,16 @@ services:
       - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
     env_file:
       - .env
+    command: >
+      postgres 
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c password_encryption=md5
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-db}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-db}" ]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 30s
     networks:
       - app-network
 
@@ -117,12 +125,41 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
+#    healthcheck:
+#      test: ["CMD", "redis-cli", "ping"]
+#      interval: 10s
+#      timeout: 3s
+#      retries: 5
+#      start_period: 10s
+    networks:
+      - app-network
+
+  pgbouncer:
+    image: pgbouncer/pgbouncer:latest
+    container_name: pgbouncer
+    ports:
+      - "6432:6432"
+    environment:
+      - DATABASES_HOST=db_golang
+      - DATABASES_USER=postgres
+      - DATABASES_PASSWORD=postgres
+      - DATABASES_PORT=5432
+      - DATABASES_DBNAME=db
+      - POOL_MODE=transaction
+      - MAX_CLIENT_CONN=1000
+      - DEFAULT_POOL_SIZE=100
+      - RESERVE_POOL_SIZE=50
+      - MAX_DB_CONNECTIONS=200
+    restart: unless-stopped
+    depends_on:
+      db_golang:
+        condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD", "nc", "-z", "127.0.0.1", "6432"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 10s
     networks:
       - app-network
 
