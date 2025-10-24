@@ -2,12 +2,11 @@ package handlers
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"practice/domains"
 	"practice/pkg/dto"
 	"practice/pkg/utils"
-
-	"github.com/gin-gonic/gin"
 )
 
 // SignUp регистрирует нового пользователя в системе

@@ -97,3 +97,17 @@ type "docker\backup\db\backup.sql" | docker exec -i db_golang psql -U postgres -
 ```
 
 docker exec db_golang pg_restore -U postgres -d db \docker\backup\db\backup_20240101_120000.dump
+
+
+11. Testing for 1000rps
+
+```bash
+# Установка wrk
+sudo apt install wrk
+
+# Тест 1000 RPS
+wrk -t12 -c400 -d30s http://localhost/api/test
+
+# Длительный тест
+wrk -t12 -c1000 -d60s http://localhost/api/test
+```
