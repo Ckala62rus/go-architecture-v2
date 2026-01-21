@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/redis/go-redis/v9"
+	"strconv"
 	"time"
 )
 
@@ -65,7 +66,14 @@ func (cache RedisCache) SetToken(
 			fmt.Println(err)
 		}
 	}(rbd)
-	res := rbd.Set(ctx, "user:"+token, token, time.Second*30)
+
+	ttl, err := strconv.Atoi(MainConfig.JwtTokenTTL)
+
+	if err != nil {
+		fmt.Println("Ошибка преобразования числа типа string в тип int:", err)
+	}
+
+	res := rbd.Set(ctx, "user:"+token, token, time.Minute*time.Duration(ttl))
 	fmt.Println(res)
 	return res
 }
