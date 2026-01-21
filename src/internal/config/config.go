@@ -10,6 +10,8 @@ import (
 type Config struct {
 	Env            string `yaml:"env" env:"ENV" env-default:"development" env-required:"true"`
 	ConfigFile     string `yaml:"config_file" env:"config_file" env-default:"config" env-required:"true"`
+	EnableTracing  bool   `yaml:"enable_tracing" env:"ENABLE_TRACING" env-default:"false"`
+	OtelEndpoint   string `yaml:"otel_endpoint" env:"OTEL_ENDPOINT" env-default:"jaeger:4318"`
 	HttpServer     `yaml:"http_server"`
 	DatabaseConfig `yaml:"database"`
 	RedisConfig    `yaml:"redis"`
@@ -39,6 +41,7 @@ type RedisConfig struct {
 
 type SecurityConfig struct {
 	JWTSigningKey string `yaml:"jwt_signing_key" env:"JWT_SIGNING_KEY" env-required:"true"`
+	JwtTokenTTL   string `yaml:"jwt_token_ttl" env:"JWT_TOKEN_TTL" env-default:"10"`
 }
 
 func MustLoad(configPath string) *Config {
